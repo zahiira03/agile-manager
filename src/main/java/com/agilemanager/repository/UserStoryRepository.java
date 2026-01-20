@@ -11,5 +11,7 @@ public interface UserStoryRepository extends JpaRepository<UserStory, Long> {
     List<UserStory> findByEpicId(Long epicId);
     List<UserStory> findByPriority(MoSCoW priority);
     List<UserStory> findByStatus(Status status);
+    List<UserStory> findBySprintId(Long sprintId);
+
 
 }
