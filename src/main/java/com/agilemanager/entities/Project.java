@@ -23,8 +23,8 @@ public class Project {
     private String name;
 
     // clé courte du projet (ex: AGILE, SCRUM01…)
-    @Column(nullable = false, unique = true, length = 10)
-    private String key;
+    @Column(name = "project_key", nullable = false, unique = true, length = 10)
+    private String projectKey;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
