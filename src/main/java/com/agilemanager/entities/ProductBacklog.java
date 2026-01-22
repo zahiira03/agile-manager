@@ -20,11 +20,12 @@ public class ProductBacklog {
     private String name;
     private String description;
 
+    @OneToOne(mappedBy = "productBacklog")
+    private Project project;
+
     @OneToMany(mappedBy = "productBacklog", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Epic> epics;
 
-    @OneToMany(mappedBy = "productBacklog", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private List<UserStory> userStories;
+
 }

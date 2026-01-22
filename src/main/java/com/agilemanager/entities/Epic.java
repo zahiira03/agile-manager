@@ -25,7 +25,7 @@ public class Epic {
     @JsonBackReference
     private ProductBacklog productBacklog;
 
-    @OneToMany(mappedBy = "epic")
+    @OneToMany(mappedBy = "epic",fetch =  FetchType.LAZY)
     @JsonManagedReference
     private List<UserStory> userStories;
 

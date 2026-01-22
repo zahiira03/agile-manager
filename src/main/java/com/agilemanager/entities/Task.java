@@ -3,8 +3,14 @@ package com.agilemanager.entities;
 import com.agilemanager.entities.enums.Status;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Task {
 
     @Id
@@ -22,19 +28,5 @@ public class Task {
     @JsonBackReference
     private UserStory userStory;
 
-    // ===== getters/setters =====
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
-
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-
-    public Status getStatus() { return status; }
-    public void setStatus(Status status) { this.status = status; }
-
-    public UserStory getUserStory() { return userStory; }
-    public void setUserStory(UserStory userStory) { this.userStory = userStory; }
 }
