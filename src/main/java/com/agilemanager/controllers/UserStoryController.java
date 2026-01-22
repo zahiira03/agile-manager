@@ -19,11 +19,11 @@ public class UserStoryController {
 
     private final UserStoryService userStoryService;
 
-    @PostMapping("/productBacklog/{productbacklogId}")
-    public UserStory createInProductBacklog(@PathVariable long productbacklogId,@RequestBody UserStory userStory){
-
-        return userStoryService.createInProductBacklog(productbacklogId,userStory);
-    }
+//    @PostMapping("/productBacklog/{productbacklogId}")
+//    public UserStory createInProductBacklog(@PathVariable long productbacklogId,@RequestBody UserStory userStory){
+//
+//        return userStoryService.createInProductBacklog(productbacklogId,userStory);
+//    }
 
     @PostMapping("/productBacklog/{productbacklogId}/epic/{epicId}")
     public UserStory createInEpic(@PathVariable Long productbacklogId,

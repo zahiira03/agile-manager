@@ -5,6 +5,7 @@ import com.agilemanager.entities.UserStory;
 import com.agilemanager.entities.ProductBacklog;
 import com.agilemanager.entities.enums.MoSCoW;
 import com.agilemanager.entities.enums.Status;
+import com.agilemanager.repository.ProductBacklogRepository;
 import com.agilemanager.repository.UserStoryRepository;
 import com.agilemanager.services.interfaces.EpicService;
 import com.agilemanager.services.interfaces.ProductBacklogService;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 
 @Service
@@ -21,25 +23,11 @@ import java.util.Objects;
 public class UserStoryServiceImpl implements UserStoryService {
 
     private final UserStoryRepository userStoryRepository;
-    private final ProductBacklogService productBacklogService;
+    private final ProductBacklogRepository productBacklogRepository;
     private final EpicService epicService;
 
 
-    @Override
-    public  UserStory createInProductBacklog(Long productBacklogId, UserStory userStory){
-        // TODO: à implémenter
-        //verifie que productBacklog exist
-        ProductBacklog productBacklog= productBacklogService.findById(productBacklogId);
-        // 2) Vérifier champs obligatoires
-        validateUserStory(userStory);
 
-        // 3) Attacher le backlog (OBLIGATOIRE)
-        userStory.setProductBacklog(productBacklog);
-        // 4) Si epic fourni, vérifier existence + cohérence backlog
-        attachEpicIfProvided(userStory, productBacklogId);
-
-        return userStoryRepository.save(userStory) ;
-    }
 
     private void validateUserStory(UserStory userStory){
         if (userStory == null) {
@@ -51,6 +39,7 @@ public class UserStoryServiceImpl implements UserStoryService {
             throw new RuntimeException("title is required");
         }
         if (userStory.getStatus() == null) {
+            //affectation in progress
             throw new RuntimeException("status is required");
         }
         if (userStory.getPriority() == null) {
@@ -79,7 +68,7 @@ public class UserStoryServiceImpl implements UserStoryService {
         // TODO: à implémenter
 
         //verifie que productBacklog exist
-        ProductBacklog productBacklog= productBacklogService.findById(productBacklogId);
+        ProductBacklog productBacklog= productBacklogRepository.findById(productBacklogId).orElseThrow(()->new RuntimeException("Product Backlog not found"));
         Epic epic= epicService.findById(epicId);
         //hna ma3ytnach 3la attachepicprovidid
         // hit 3tana epic fin khassna ncree userstory
@@ -112,7 +101,7 @@ public class UserStoryServiceImpl implements UserStoryService {
     public List<UserStory> findByProductBacklog(Long productbacklogId){
 
         //doit verifier si ce productbacklog existe
-        productBacklogService.findById(productbacklogId);
+        productBacklogRepository.findById(productbacklogId);
         return userStoryRepository.findByProductBacklogId(productbacklogId);
     }
 

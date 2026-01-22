@@ -8,7 +8,6 @@ import java.util.List;
 
 public interface UserStoryService {
 
-    UserStory createInProductBacklog(Long backlogId, UserStory userStory);
     UserStory createInEpic(Long productbacklogId, Long epicId, UserStory userStory);
     List<UserStory> findAll();
     UserStory findById(Long id);

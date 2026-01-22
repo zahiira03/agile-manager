@@ -28,5 +28,10 @@ public class Task {
     @JsonBackReference
     private UserStory userStory;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonBackReference
+    private User assignedUser;
+
 
 }
