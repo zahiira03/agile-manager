@@ -16,6 +16,9 @@ public class ProductBacklogServiceImpl implements ProductBacklogService {
 
     @Override
     public ProductBacklog create(ProductBacklog productBacklog) {
+        if  (productBacklog == null) {
+            throw new IllegalArgumentException("productBacklog cannot be null");
+        }
         return productBacklogRepository.save(productBacklog);
     }
 
@@ -35,7 +38,13 @@ public class ProductBacklogServiceImpl implements ProductBacklogService {
 
     @Override
     public ProductBacklog update(Long id, ProductBacklog productBacklog) {
-        productBacklog.setId(id);
+
+        ProductBacklog existing = productBacklogRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("ProductBacklog not found: " + id));
+
+        // On conserve l’ID existant
+        productBacklog.setId(existing.getId());
+
         return productBacklogRepository.save(productBacklog);
     }
 
