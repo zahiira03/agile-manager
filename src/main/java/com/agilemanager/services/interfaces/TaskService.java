@@ -1,19 +1,22 @@
 package com.agilemanager.services.interfaces;
 
-import com.agilemanager.entities.Task;
+import com.agilemanager.Dtos.TaskDTO;
 import com.agilemanager.entities.enums.Status;
 
 import java.util.List;
 
 public interface TaskService {
 
-    Task createTask(Long userStoryId, Task task);
+    // CRUD Task (DTO)
+    TaskDTO createTask(TaskDTO dto);
+    List<TaskDTO> getAllTasks();
+    TaskDTO getTask(Long id);
+    TaskDTO updateTask(Long id, TaskDTO dto);
+    void deleteTask(Long id);
+    List<TaskDTO> getTasksByStatus(Status status);
 
-    List<Task> getTasksByUserStory(Long userStoryId);
+    List<TaskDTO> getTasksByUserStory(Long userStoryId);
 
-    Task updateTask(Long taskId, Task task);
-
-    Task changeStatus(Long taskId, Status status);
-
-    void deleteTask(Long taskId);
+    TaskDTO assignTaskToUserStory(Long taskId, Long userStoryId);
+    void unassignTaskFromUserStory(Long taskId);
 }
