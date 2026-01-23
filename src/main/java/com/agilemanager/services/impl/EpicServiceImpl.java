@@ -1,9 +1,13 @@
 package com.agilemanager.services.impl;
 
+import com.agilemanager.Dtos.EpicDto;
 import com.agilemanager.entities.Epic;
 import com.agilemanager.entities.ProductBacklog;
 import com.agilemanager.entities.UserStory;
+import com.agilemanager.exceptions.ResourceNotFoundException;
+import com.agilemanager.mappers.EpicMapper;
 import com.agilemanager.repository.EpicRepository;
+import com.agilemanager.repository.ProductBacklogRepository;
 import com.agilemanager.services.interfaces.EpicService;
 import com.agilemanager.services.interfaces.ProductBacklogService;
 import jakarta.transaction.Transactional;
@@ -16,13 +20,14 @@ import java.util.List;
 public class EpicServiceImpl implements EpicService {
 
     private final EpicRepository epicRepository;
-    //private final ProductBacklogRepository productBacklogRepository;
-    private final ProductBacklogService productBacklogService;
+    private final ProductBacklogRepository productBacklogRepository;
+    private final EpicMapper epicMapper;
+
 
     @Override
-    public Epic create(Long productBacklogId, Epic epic) {
+    public EpicDto createEpic(Long productBacklogId, EpicDto epicDto) {
 
-        if (epic.getTitle() == null || epic.getTitle().trim().isEmpty()) {
+        if (epicDto.getTitle() == null || epicDto.getTitle().trim().isEmpty()) {
             throw new RuntimeException("Epic title is required");
         }
 
@@ -31,61 +36,78 @@ public class EpicServiceImpl implements EpicService {
             throw new RuntimeException("Epic must be linked to a ProductBacklog");
         }
 
-        // ✅ vérifie existence via le service (SRP + DIP)
-        ProductBacklog productbacklog = productBacklogService.findById(productBacklogId);
-
+        // vérifie existence via le service (SRP + DIP)
+        ProductBacklog productbacklog = productBacklogRepository.findById(productBacklogId).orElseThrow(() -> new ResourceNotFoundException(
+                "ProductBacklog not found: " + productBacklogId
+        ));
+        Epic epic = epicMapper.toEntity(epicDto);
         epic.setProductBacklog(productbacklog);
-        return epicRepository.save(epic);
+        Epic savedepic = epicRepository.save(epic);
+        return epicMapper.toEpicDto(savedepic);
     }
     @Override
-    public Epic update(Long id, Epic epic) {
+    public EpicDto updateEpic(Long id, EpicDto epicDto) {
         //trouver epic a modifier
-        Epic existing = findById(id); // finfByid va genere exception si pas trouver
-        if(epic.getTitle()==null  || epic.getTitle().trim().isEmpty())
-        {
-                throw new RuntimeException("Epic title cannot be null or empty");
-        }
+        Epic existing = epicRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Epic not found: " + id));; // finfByid va genere exception si pas trouver
+//        if(epic.getTitle()==null  || epic.getTitle().trim().isEmpty())
+//        {
+//                throw new RuntimeException("Epic title cannot be null or empty");
+//        }//je dois aussi verifie si title n`est pas vide car il est nullable = false
 
-            //je dois aussi verifie si title n`est pas vide car il est nullable = false
-            existing.setTitle(epic.getTitle());
-            existing.setDescription(epic.getDescription());
-            return epicRepository.save(existing);
+//      je fait les modification
+//      existing.setTitle(epicDto.getTitle());
+//      existing.setDescription(epicDto.getDescription());
+        epicMapper.updateEntityFromDto(epicDto, existing);
+        Epic savedEpic = epicRepository.save(existing);
+        return epicMapper.toEpicDto(savedEpic);
 
 
     }
 
     @Override
     @Transactional
-    public void delete(Long id){
-        Epic epic = findById(id);// exception si non trouvé
+    public void deleteEpic(Long id){
+        Epic existing  = epicRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(
+                "epic not found: " + id
+        ));
 
         // 1️Détacher les UserStories
-        if(epic.getUserStories()!= null){
-            for(UserStory userStory : epic.getUserStories()){
-                userStory.setEpic(null);
-        }
-        }
+//        if(existing.getUserStories()!= null){
+//            for(UserStory userStory : existing.getUserStories()){
+//                userStory.setEpic(null);
+//        }
+//        }
 
-        epicRepository.delete(epic);
+        epicRepository.delete(existing);
         //epicRepository.deleteById(id);
     }
 
     @Override
-    public Epic findById(Long id) {
-        return epicRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Epic not found with id " + id));
+    public EpicDto findById(Long id) {
+        Epic epic = epicRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Epic not found with id " + id));
+        return epicMapper.toEpicDto(epic);
+
     }
     @Override
-    public List<Epic> findAll(){// lister tous les epics
-        return epicRepository.findAll();
+    public List<EpicDto> findAll(){// lister tous les epics
+        return epicRepository.findAll()
+                .stream()
+                .map(epicMapper::toEpicDto)
+                .toList();
     }
 
     @Override
-    public List<Epic> findByProductBacklog(Long productBacklogId){
+    public List<EpicDto> findByProductBacklog(Long productBacklogId) {
+        // Optionnel : vérifier l'existence du backlog pour renvoyer 404 si inexistant
+        if (!productBacklogRepository.existsById(productBacklogId)) {
+            throw new ResourceNotFoundException("ProductBacklog not found: " + productBacklogId);
+        }
 
-        productBacklogService.findById(productBacklogId);// exception si absent
+        // Nécessite une méthode repository : findByProductBacklogId(...)
+        return epicRepository.findByProductBacklogId(productBacklogId)
+                .stream()
+                .map(epicMapper::toEpicDto)
+                .toList();
+    }
+    }
 
-        return epicRepository.findByProductBacklogId(productBacklogId);
-    } // lister les epics d’un backlog
-
-}

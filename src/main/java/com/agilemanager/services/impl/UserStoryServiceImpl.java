@@ -1,18 +1,18 @@
 package com.agilemanager.services.impl;
 
+import com.agilemanager.Dtos.UserStoryDto;
 import com.agilemanager.entities.Epic;
 import com.agilemanager.entities.UserStory;
-import com.agilemanager.entities.ProductBacklog;
 import com.agilemanager.entities.enums.MoSCoW;
 import com.agilemanager.entities.enums.Status;
-import com.agilemanager.repository.ProductBacklogRepository;
+import com.agilemanager.exceptions.ResourceNotFoundException;
+import com.agilemanager.mappers.UserStoryMapper;
+import com.agilemanager.repository.EpicRepository;
 import com.agilemanager.repository.UserStoryRepository;
-import com.agilemanager.services.interfaces.EpicService;
-import com.agilemanager.services.interfaces.ProductBacklogService;
 import com.agilemanager.services.interfaces.UserStoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import com.agilemanager.exceptions.ResourceNotFoundException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,143 +22,93 @@ import java.util.Optional;
 @RequiredArgsConstructor //fait l`injection avec constructeur
 public class UserStoryServiceImpl implements UserStoryService {
 
-    private final UserStoryRepository userStoryRepository;
-    private final ProductBacklogRepository productBacklogRepository;
-    private final EpicService epicService;
+        private final UserStoryRepository userStoryRepository;
+        private final EpicRepository epicRepository;
+        private final UserStoryMapper userStoryMapper;
 
+        @Override
+        public UserStoryDto createUserStory(Long epicId, UserStoryDto userStoryDto) {
 
-
-
-    private void validateUserStory(UserStory userStory){
-        if (userStory == null) {
-            throw new RuntimeException("UserStory body is required");
+            Epic epic = epicRepository.findById(epicId)
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Epic not found: " + epicId
+                    ));
+            UserStory userStory = userStoryMapper.toEntity(userStoryDto);
+            userStory.setEpic(epic);
+            UserStory saved = userStoryRepository.save(userStory);
+            return userStoryMapper.toDto(saved);
         }
 
 
-        if(userStory.getTitle() == null || userStory.getTitle().isEmpty()){
-            throw new RuntimeException("title is required");
-        }
-        if (userStory.getStatus() == null) {
-            //affectation in progress
-            throw new RuntimeException("status is required");
-        }
-        if (userStory.getPriority() == null) {
-            throw new RuntimeException("priority is required");
+        @Override
+        public UserStoryDto findById(Long id) {
+            UserStory userStory = userStoryRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "UserStory not found: " + id
+                    ));
+            return userStoryMapper.toDto(userStory);
         }
 
-    }
+        // hadi rat3tini ga3 les userstory f product backlog
+        @Override
+        public List<UserStoryDto> findAll() {
+            return userStoryRepository.findAll()
+                    .stream()
+                    .map(userStoryMapper::toDto)
+                    .toList();
+        }
 
-    private void attachEpicIfProvided(UserStory userStory, Long productBacklogId){
-
-        if(userStory.getEpic() != null && userStory.getEpic().getId() != null){
-            Epic existingEpic=epicService.findById(userStory.getEpic().getId());
-            long epicBacklogId =existingEpic.getProductBacklog().getId();// je veux recupere id de productbacklog de ce epic
-            if (! Objects.equals(epicBacklogId,productBacklogId)){
-                throw new RuntimeException("Epic does not belong to the given ProductBacklog");
+        // hadi rat3tini ri les userstory li kaynin fwahed epics
+        @Override
+        public List<UserStoryDto> findByEpicId(Long epicId) {
+            if (!epicRepository.existsById(epicId)) {
+                throw new ResourceNotFoundException("Epic not found: " + epicId);
             }
-            userStory.setEpic(existingEpic);
-        } else {
-            userStory.setEpic(null); // optionnel : clarifie
+
+            return userStoryRepository.findByEpicId(epicId)
+                    .stream()
+                    .map(userStoryMapper::toDto)
+                    .toList();
         }
 
-    }
 
-    @Override
-    public  UserStory createInEpic(Long productBacklogId, Long epicId, UserStory userStory){
-        // TODO: à implémenter
-
-        //verifie que productBacklog exist
-        ProductBacklog productBacklog= productBacklogRepository.findById(productBacklogId).orElseThrow(()->new RuntimeException("Product Backlog not found"));
-        Epic epic= epicService.findById(epicId);
-        //hna ma3ytnach 3la attachepicprovidid
-        // hit 3tana epic fin khassna ncree userstory
-        if (! Objects.equals(epicId,productBacklogId)){
-            throw new RuntimeException("Epic does not belong to the given ProductBacklog");
+        @Override
+        public List<UserStoryDto> findByPriority(MoSCoW priority) {
+            return userStoryRepository.findByPriority(priority)
+                    .stream()
+                    .map(userStoryMapper::toDto)
+                    .toList();
         }
-        // 4) valider champs obligatoires
-        validateUserStory(userStory);
 
-        // 5) forcer les liens (le PATH décide)
-        userStory.setEpic(epic);
-        userStory.setProductBacklog(productBacklog);
-
-        return userStoryRepository.save(userStory);
-
-    }
-
-    @Override
-    public List<UserStory> findAll() {
-        return userStoryRepository.findAll();
-    }
-
-    @Override
-    public UserStory findById(Long id){
-        return userStoryRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("UserStory not found with id " + id));
-    }
-
-    @Override
-    public List<UserStory> findByProductBacklog(Long productbacklogId){
-
-        //doit verifier si ce productbacklog existe
-        productBacklogRepository.findById(productbacklogId);
-        return userStoryRepository.findByProductBacklogId(productbacklogId);
-    }
-
-    @Override
-    public List<UserStory> findByEpic(Long epicId){
-
-        epicService.findById(epicId);
-        return userStoryRepository.findByEpicId(epicId);
-    }
-
-    @Override
-    public List<UserStory> findByPriority(MoSCoW priority){
-        if(priority == null){
-            throw new RuntimeException("priority is required");
+        @Override
+        public List<UserStoryDto> findByStatus(Status status) {
+            return userStoryRepository.findByStatus(status)
+                    .stream()
+                    .map(userStoryMapper::toDto)
+                    .toList();
         }
-        return userStoryRepository.findByPriority(priority);
-    }
 
-    @Override
-    public List<UserStory> findByStatus(Status status){
-        if(status == null){
-            throw new RuntimeException("status is required");
+
+        @Override
+        public UserStoryDto updateUserStory(Long id, UserStoryDto userStoryDto) {
+
+            UserStory existing = userStoryRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "UserStory not found: " + id
+                    ));
+
+            userStoryMapper.updateEntityFromDto(userStoryDto, existing);
+            UserStory saved = userStoryRepository.save(existing);
+            return userStoryMapper.toDto(saved);
         }
-        return userStoryRepository.findByStatus(status);
+
+        @Override
+        public void deleteUserStory(Long id) {
+            UserStory existing = userStoryRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "UserStory not found: " + id
+                    ));
+            userStoryRepository.delete(existing);
+        }
     }
 
-    @Override
-    public UserStory update(Long id, UserStory userStory){
-        //userstory doit exister
-        // 1) vérifier existence
-        //UserStory existing = userStoryRepository.findById(id); hena l9it mochkil f findById
-        // hit type de retour kaykon optional  bhala laglty makatgerech exception
-        UserStory existing = userStoryRepository.findById(id).orElseThrow(() -> new RuntimeException("UserStory not found with id " + id));
-
-        //UserStory existing = userStoryService.findById(id);
-        validateUserStory(userStory);
-
-        // 4) mise à jour des champs autorisés (sans toucher aux relations)
-        existing.setTitle(userStory.getTitle());
-        existing.setDescription(userStory.getDescription());
-        //existing.setAcceptanceCriteria(userStory.getAcceptanceCriteria());
-        existing.setPriority(userStory.getPriority());
-        existing.setStatus(userStory.getStatus());
-
-        // 5) save
-        return userStoryRepository.save(existing);
-
-
-    }
-
-    @Override
-    public void delete(Long id) {
-        // 1) vérifier existence
-        UserStory existing = userStoryRepository.findById(id).orElseThrow(() -> new RuntimeException("UserStory not found with id " + id));
-
-        // 2) supprimer
-        userStoryRepository.delete(existing);
-    }
-
-}

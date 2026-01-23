@@ -1,82 +1,80 @@
 package com.agilemanager.controllers;
 
-
-import com.agilemanager.entities.UserStory;
+import com.agilemanager.Dtos.UserStoryDto;
 import com.agilemanager.entities.enums.MoSCoW;
 import com.agilemanager.entities.enums.Status;
 import com.agilemanager.services.interfaces.UserStoryService;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
+@AllArgsConstructor
 @RestController
-@RequestMapping("/api/userStories")
-@RequiredArgsConstructor
-
+@RequestMapping("/api")
 public class UserStoryController {
 
     private final UserStoryService userStoryService;
 
-//    @PostMapping("/productBacklog/{productbacklogId}")
-//    public UserStory createInProductBacklog(@PathVariable long productbacklogId,@RequestBody UserStory userStory){
+    @PostMapping("/epics/{epicId}/user-stories")
+    public ResponseEntity<UserStoryDto> createUserStory(
+            @PathVariable Long epicId,
+            @RequestBody UserStoryDto userStoryDto
+    ) {
+        UserStoryDto created = userStoryService.createUserStory(epicId, userStoryDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    @GetMapping("/user-stories/{id}")
+    public ResponseEntity<UserStoryDto> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(userStoryService.findById(id));
+    }
+
+    @GetMapping("/epics/{epicId}/user-stories")
+    public ResponseEntity<List<UserStoryDto>> getByEpic(@PathVariable Long epicId) {
+        return ResponseEntity.ok(userStoryService.findByEpicId(epicId));
+    }
+
+    @PutMapping("/user-stories/{id}")
+    public ResponseEntity<UserStoryDto> update(
+            @PathVariable Long id,
+            @RequestBody UserStoryDto userStoryDto
+    ) {
+        return ResponseEntity.ok(userStoryService.updateUserStory(id, userStoryDto));
+    }
+
+
+    @DeleteMapping("/user-stories/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        userStoryService.deleteUserStory(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
+//    // =========================================
+//    // GET all UserStories
+//    // GET /api/user-stories
+//    // + optional filters: ?priority=... &status=...
+//    // =========================================
+//    @GetMapping("/user-stories")
+//    public ResponseEntity<List<UserStoryDto>> getAll(
+//            @RequestParam(required = false) MoSCoW priority,
+//            @RequestParam(required = false) Status status
+//    ) {
 //
-//        return userStoryService.createInProductBacklog(productbacklogId,userStory);
+//        // Si les deux filtres existent, on applique un choix simple :
+//        // priorité > status (ou tu peux créer une méthode repo combinée plus tard).
+//        if (priority != null) {
+//            return ResponseEntity.ok(userStoryService.findByPriority(priority));
+//        }
+//        if (status != null) {
+//            return ResponseEntity.ok(userStoryService.findByStatus(status));
+//        }
+//
+//        return ResponseEntity.ok(userStoryService.findAll());
 //    }
-
-    @PostMapping("/productBacklog/{productbacklogId}/epic/{epicId}")
-    public UserStory createInEpic(@PathVariable Long productbacklogId,
-                                  @PathVariable Long epicId,
-                                  @RequestBody UserStory userStory){
-
-
-        return userStoryService.createInEpic(productbacklogId,epicId,userStory);
-    }
-    @GetMapping
-    public List<UserStory> getAll(){
-        return userStoryService.findAll();
-    }
-    @GetMapping("/{id}")
-    public UserStory getById(@PathVariable Long id){
-        return userStoryService.findById(id);
-    }
-
-    @GetMapping("/productbacklog/{productbacklogId}")
-    public List<UserStory> getByProductBacklog(@PathVariable Long productbacklogId){
-        return userStoryService.findByProductBacklog(productbacklogId);
-    }
-
-    @GetMapping("/epic/{epicId}")
-    public List<UserStory> getByEpic(@PathVariable  Long epicId){
-        return userStoryService.findByEpic(epicId);
-    }
-
-    @GetMapping("/priority/{priority}")
-    public List<UserStory> getByPriority(@PathVariable MoSCoW priority){
-        return userStoryService.findByPriority(priority) ;
-    }
-
-    @GetMapping("/status/{status}")
-    public List<UserStory> getByStatus(@PathVariable Status status){
-        return userStoryService.findByStatus(status);
-    }
-
-    @PutMapping("/{id}")
-    public UserStory update(@PathVariable Long id, @RequestBody UserStory userStory){
-        return userStoryService.update(id, userStory);
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id){
-        userStoryService.delete(id);
-    }
-
-
-
-
-
-
 
 
 

@@ -1,6 +1,10 @@
 package com.agilemanager.services.impl;
 
+import com.agilemanager.Dtos.ProductBacklogDto;
 import com.agilemanager.entities.ProductBacklog;
+import com.agilemanager.entities.Project;
+import com.agilemanager.exceptions.ResourceNotFoundException;
+import com.agilemanager.mappers.ProductBacklogMapper;
 import com.agilemanager.repository.ProductBacklogRepository;
 import com.agilemanager.services.interfaces.ProductBacklogService;
 import lombok.RequiredArgsConstructor;
@@ -13,43 +17,60 @@ import java.util.List;
 public class ProductBacklogServiceImpl implements ProductBacklogService {
 
     private final ProductBacklogRepository productBacklogRepository;
+    private final ProductBacklogMapper productBacklogMapper;
 
     @Override
-    public ProductBacklog create(ProductBacklog productBacklog) {
-        if  (productBacklog == null) {
+    public ProductBacklogDto findById(Long id) {
+        ProductBacklog productBacklog = productBacklogRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(
+                "ProductBacklog not found: " + id
+        ));
+
+//                orElseThrow(() ->
+//                new RuntimeException("ProductBacklog not found with id " + id)
+//        );
+        return productBacklogMapper.toDto(productBacklog);
+    }
+
+    @Override
+    public List< ProductBacklogDto> findAll() {
+
+        return productBacklogRepository.findAll()
+                .stream()
+                .map(productBacklogMapper::toDto)
+                .toList();
+    }
+
+
+    @Override
+    public  ProductBacklogDto createProductBacklog(ProductBacklogDto productBacklogDto) {
+        if  (productBacklogDto == null) {
             throw new IllegalArgumentException("productBacklog cannot be null");
         }
-        return productBacklogRepository.save(productBacklog);
+        ProductBacklog productbacklog = productBacklogMapper.toEntity(productBacklogDto);
+        ProductBacklog savedProductBacklog= productBacklogRepository.save(productbacklog);
+
+        return productBacklogMapper.toDto(savedProductBacklog);
     }
 
-    @Override
-    public List<ProductBacklog> findAll() {
-        return productBacklogRepository.findAll();
-    }
 
     @Override
-    public ProductBacklog findById(Long id) {
-        return productBacklogRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("ProductBacklog not found with id " + id)
-                );
-
-    }
-
-    @Override
-    public ProductBacklog update(Long id, ProductBacklog productBacklog) {
+    public ProductBacklogDto updateProductBacklog(Long id, ProductBacklogDto productBacklogDto) {
 
         ProductBacklog existing = productBacklogRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("ProductBacklog not found: " + id));
 
-        // On conserve l’ID existant
-        productBacklog.setId(existing.getId());
+        productBacklogMapper.updateEntityFromDto(productBacklogDto, existing);
 
-        return productBacklogRepository.save(productBacklog);
+        ProductBacklog saved = productBacklogRepository.save(existing);
+
+
+        return productBacklogMapper.toDto(saved);
     }
 
     @Override
-    public void delete(Long id) {
-        productBacklogRepository.deleteById(id);
+    public void deleteProductBacklog(Long id) {
+        ProductBacklog productBacklog = productBacklogRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("ProductBacklog not found: " + id));
+        productBacklogRepository.delete(productBacklog);
     }
 }

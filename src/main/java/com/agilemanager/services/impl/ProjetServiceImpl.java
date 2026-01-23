@@ -16,9 +16,11 @@ import java.util.List;
 @AllArgsConstructor
 @Service
 public class ProjetServiceImpl implements ProjetService {
+
     private ProjectRepository projectRepository;
     private ProjectMapper projectMapper;
     private final ProductBacklogRepository productBacklogRepository;
+
     @Override
     public ProjectDto getProject(Long id) {
         Project project = projectRepository.findById(id)

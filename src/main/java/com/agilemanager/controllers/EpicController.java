@@ -1,71 +1,63 @@
 package com.agilemanager.controllers;
 
-import com.agilemanager.entities.Epic;
-import com.agilemanager.entities.ProductBacklog;
+import com.agilemanager.Dtos.EpicDto;
 import com.agilemanager.services.interfaces.EpicService;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@AllArgsConstructor
 @RestController
-@RequestMapping("/api/epics")
-@RequiredArgsConstructor
+@RequestMapping("/api")
 public class EpicController {
 
     private final EpicService epicService;
 
-    // 1️⃣ Lister tous les epics
 
-    @GetMapping
-    public List<Epic> getAllEpics() {
-        return epicService.findAll();
-    }
-
-
-    // 2️⃣ Récupérer un epic par id
-
-    @GetMapping("/{id}")
-    public Epic getEpicById(@PathVariable Long id) {
-        return epicService.findById(id);
-    }
-
-
-    // 3️⃣ Créer un epic dans un product backlog
-
-    @PostMapping("/productBacklog/{productbacklogId}")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Epic createEpic(
-            @PathVariable Long productbacklogId,
-            @RequestBody Epic epic
+    @PostMapping("/product-backlogs/{productBacklogId}/epics")
+    public ResponseEntity<EpicDto> createEpic(
+            @PathVariable Long productBacklogId,
+            @RequestBody EpicDto epicDto
     ) {
-        return epicService.create(productbacklogId,epic);
+        EpicDto created = epicService.createEpic(productBacklogId, epicDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
 
-    // 4️⃣ Mettre à jour un epic
+    // GET epics by ProductBacklog
+    @GetMapping("/product-backlogs/{productBacklogId}/epics")
+    public ResponseEntity<List<EpicDto>> getEpicsByBacklog(@PathVariable Long productBacklogId) {
+        return ResponseEntity.ok(epicService.findByProductBacklog(productBacklogId));
+    }
 
-    @PutMapping("/{id}")
-    public Epic updateEpic(
+    // GET all epics dyal ga3 les product backlog
+    // GET /api/epics
+    @GetMapping("/epics")
+    public ResponseEntity<List<EpicDto>> getAllEpics() {
+        return ResponseEntity.ok(epicService.findAll());
+    }
+
+    // GET epic by id
+    @GetMapping("/epics/{id}")
+    public ResponseEntity<EpicDto> getEpicById(@PathVariable Long id) {
+        return ResponseEntity.ok(epicService.findById(id));
+    }
+
+
+    @PutMapping("/epics/{id}")
+    public ResponseEntity<EpicDto> updateEpic(
             @PathVariable Long id,
-            @RequestBody Epic epic
+            @RequestBody EpicDto epicDto
     ) {
-        return epicService.update(id, epic);
+        return ResponseEntity.ok(epicService.updateEpic(id, epicDto));
     }
 
-
-    // 5️⃣ Supprimer un epic
-
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteEpic(@PathVariable Long id) {
-        epicService.delete(id);
-    }
-
-    // 5️⃣  epics associe a un productbacklog
-    @GetMapping("/productBacklog/{productbacklogId}")
-    public List<Epic> findByProductBacklog(@PathVariable long productbacklogId){
-        return epicService.findByProductBacklog(productbacklogId);
+    @DeleteMapping("/epics/{id}")
+    public ResponseEntity<Void> deleteEpic(@PathVariable Long id) {
+        epicService.deleteEpic(id);
+        return ResponseEntity.noContent().build();
     }
 }
