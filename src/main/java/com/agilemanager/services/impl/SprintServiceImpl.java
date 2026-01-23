@@ -1,6 +1,7 @@
 package com.agilemanager.services.impl;
 
 import com.agilemanager.Dtos.SprintDTO;
+import com.agilemanager.Dtos.UserStoryDto;
 import com.agilemanager.entities.Project;
 import com.agilemanager.entities.Sprint;
 import com.agilemanager.entities.UserStory;
@@ -99,7 +100,7 @@ public class SprintServiceImpl implements SprintService {
     // -------------------------
 
     @Override
-    public List<UserStoryDTO> getSprintBacklog(Long sprintId) {
+    public List<UserStoryDto> getSprintBacklog(Long sprintId) {
 
         return userStoryRepository.findBySprintId(sprintId)
                 .stream()
@@ -109,7 +110,7 @@ public class SprintServiceImpl implements SprintService {
 
     @Override
     @Transactional
-    public UserStoryDTO addUserStoryToSprint(Long sprintId, Long userStoryId) {
+    public UserStoryDto addUserStoryToSprint(Long sprintId, Long userStoryId) {
         Sprint sprint = getSprintEntity(sprintId);
 
         UserStory userStory = userStoryRepository.findById(userStoryId)
@@ -123,7 +124,7 @@ public class SprintServiceImpl implements SprintService {
 
     @Override
     @Transactional
-    public UserStoryDTO removeUserStoryFromSprint(Long sprintId, Long userStoryId) {
+    public UserStoryDto removeUserStoryFromSprint(Long sprintId, Long userStoryId) {
         // كنحيّدو sprint من user story
         UserStory userStory = userStoryRepository.findById(userStoryId)
                 .orElseThrow(() -> new RuntimeException("UserStory not found with id: " + userStoryId));

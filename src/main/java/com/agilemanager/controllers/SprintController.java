@@ -1,7 +1,7 @@
 package com.agilemanager.controllers;
 
 import com.agilemanager.Dtos.SprintDTO;
-import com.agilemanager.Dtos.UserStoryDTO;
+import com.agilemanager.Dtos.UserStoryDto;
 import com.agilemanager.services.interfaces.SprintService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -54,20 +54,20 @@ public class SprintController {
 
     // GET Sprint Backlog (UserStories)
     @GetMapping("/{sprintId}/backlog")
-    public ResponseEntity<List<UserStoryDTO>> backlog(@PathVariable Long sprintId) {
+    public ResponseEntity<List<UserStoryDto>> backlog(@PathVariable Long sprintId) {
         return ResponseEntity.ok(sprintService.getSprintBacklog(sprintId));
     }
 
     // ADD UserStory to Sprint
     @PostMapping("/{sprintId}/userStories/{userStoryId}")
-    public ResponseEntity<UserStoryDTO> addUserStory(@PathVariable Long sprintId,
+    public ResponseEntity<UserStoryDto> addUserStory(@PathVariable Long sprintId,
                                                      @PathVariable Long userStoryId) {
         return ResponseEntity.ok(sprintService.addUserStoryToSprint(sprintId, userStoryId));
     }
 
     // REMOVE UserStory from Sprint
     @DeleteMapping("/{sprintId}/userStories/{userStoryId}")
-    public ResponseEntity<UserStoryDTO> removeUserStory(@PathVariable Long sprintId,
+    public ResponseEntity<UserStoryDto> removeUserStory(@PathVariable Long sprintId,
                                                         @PathVariable Long userStoryId) {
         return ResponseEntity.ok(sprintService.removeUserStoryFromSprint(sprintId, userStoryId));
     }

@@ -1,6 +1,7 @@
 package com.agilemanager.services.interfaces;
 
 import com.agilemanager.Dtos.SprintDTO;
+import com.agilemanager.Dtos.UserStoryDto;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public interface SprintService {
     void deleteSprint(Long id);
 
     // Sprint Backlog (UserStories)
-    List<UserStoryDTO> getSprintBacklog(Long sprintId);
-    UserStoryDTO addUserStoryToSprint(Long sprintId, Long userStoryId);
-    UserStoryDTO removeUserStoryFromSprint(Long sprintId, Long userStoryId);
+    List<UserStoryDto> getSprintBacklog(Long sprintId);
+    UserStoryDto addUserStoryToSprint(Long sprintId, Long userStoryId);
+    UserStoryDto removeUserStoryFromSprint(Long sprintId, Long userStoryId);
 }
