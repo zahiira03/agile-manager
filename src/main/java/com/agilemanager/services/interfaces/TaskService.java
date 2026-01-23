@@ -14,9 +14,10 @@ public interface TaskService {
     TaskDTO updateTask(Long id, TaskDTO dto);
     void deleteTask(Long id);
     List<TaskDTO> getTasksByStatus(Status status);
+    List<TaskDTO> getTasksByAssignedUser(Long userId);
 
     List<TaskDTO> getTasksByUserStory(Long userStoryId);
 
-    TaskDTO assignTaskToUserStory(Long taskId, Long userStoryId);
-    void unassignTaskFromUserStory(Long taskId);
+    void assignTaskToUserStory(Long taskId, Long userStoryId);
+    void assignTaskToUser(Long taskId, Long userId);
 }

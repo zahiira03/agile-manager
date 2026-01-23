@@ -1,48 +1,27 @@
 package com.agilemanager.mappers;
 
 import com.agilemanager.Dtos.SprintDTO;
-import com.agilemanager.entities.Project;
 import com.agilemanager.entities.Sprint;
-import org.springframework.stereotype.Component;
+import org.mapstruct.*;
 
-@Component
-public class SprintMapper {
+import java.util.List;
 
-    public Sprint toEntity(SprintDTO dto, Project project) {
-        if (dto == null) return null;
+@Mapper(componentModel = "spring")
+public interface SprintMapper {
 
-        return Sprint.builder()
-                // id ما كنحطّوهش ف create (DB كتولد)
-                .name(dto.getName())
-                .startDate(dto.getStartDate())
-                .endDate(dto.getEndDate())
-                .status(dto.getStatus())
-                .project(project)
-                .build();
-    }
+    @Mapping(source = "project.id", target = "projectId")
+    SprintDTO toDto(Sprint sprint);
 
-    public void updateEntity(Sprint sprint, SprintDTO dto, Project project) {
-        // update: كنبدلو الحقول
-        sprint.setName(dto.getName());
-        sprint.setStartDate(dto.getStartDate());
-        sprint.setEndDate(dto.getEndDate());
-        sprint.setStatus(dto.getStatus());
-        sprint.setProject(project);
-    }
+    @Mapping(target = "project", ignore = true)      //  service
+    @Mapping(target = "userStories", ignore = true)  // user stories  mapping
+    Sprint toEntity(SprintDTO dto);
 
-    public SprintDTO toDto(Sprint sprint) {
-        if (sprint == null) return null;
+    List<SprintDTO> toDtoList(List<Sprint> sprints);
 
-        SprintDTO dto = new SprintDTO();
-        dto.setId(sprint.getId());
-        dto.setName(sprint.getName());
-        dto.setStartDate(sprint.getStartDate());
-        dto.setEndDate(sprint.getEndDate());
-        dto.setStatus(sprint.getStatus());
-
-        // علاقة Sprint مع Project
-        dto.setProjectId(sprint.getProject() != null ? sprint.getProject().getId() : null);
-
-        return dto;
-    }
+    // update entity from dto
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "project", ignore = true)
+    @Mapping(target = "userStories", ignore = true)
+    void updateEntityFromDto(SprintDTO dto, @MappingTarget Sprint sprint);
 }

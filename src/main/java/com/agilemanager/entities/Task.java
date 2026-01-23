@@ -23,14 +23,16 @@ public class Task {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @ManyToOne
-    @JoinColumn(name = "user_story_id")
-    @JsonBackReference
+    // Task -> UserStory (many tasks for one userStory)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_story_id", nullable = false)
+    @JsonBackReference("userStory-tasks")
     private UserStory userStory;
 
-    @ManyToOne
+    // Task -> User (assigned developer)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @JsonBackReference
+    @JsonBackReference("user-tasks")
     private User assignedUser;
 
 

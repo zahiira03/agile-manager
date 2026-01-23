@@ -18,8 +18,11 @@ public interface SprintService {
 
     void deleteSprint(Long id);
 
-    // Sprint Backlog (UserStories)
-    List<UserStoryDto> getSprintBacklog(Long sprintId);
-    UserStoryDto addUserStoryToSprint(Long sprintId, Long userStoryId);
-    UserStoryDto removeUserStoryFromSprint(Long sprintId, Long userStoryId);
+    List<SprintDTO> getSprintsByProject(Long projectId);
+
+    // Assign user story to sprint
+    void assignUserStoryToSprint(Long sprintId, Long userStoryId);
+
+    // Get userStories of sprint (إلا بغيتهم DTO)
+    List<UserStoryDto> getUserStoriesBySprint(Long sprintId);
 }

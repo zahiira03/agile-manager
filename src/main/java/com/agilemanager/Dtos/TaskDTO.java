@@ -12,7 +12,8 @@ public class TaskDTO {
     private String title;
     private String description;
     private Status status;
-    private Long user;
+
+    private Long assignedUserId;
     private Long userStoryId;
 
 }

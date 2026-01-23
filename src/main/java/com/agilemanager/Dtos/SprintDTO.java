@@ -23,6 +23,8 @@ public class SprintDTO {
     // Sprint appartient à projet
     private Long projectId;
 
+    // sprint contient les userstory
+    private List<Long> userStoryIds;
 
 
 }

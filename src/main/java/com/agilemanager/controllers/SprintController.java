@@ -2,6 +2,7 @@ package com.agilemanager.controllers;
 
 import com.agilemanager.Dtos.SprintDTO;
 import com.agilemanager.Dtos.UserStoryDto;
+import com.agilemanager.Dtos.UserStoryDto;
 import com.agilemanager.services.interfaces.SprintService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,59 +17,52 @@ public class SprintController {
 
     private final SprintService sprintService;
 
-    // CREATE Sprint
+    // Create sprint (requires projectId)
     @PostMapping
     public ResponseEntity<SprintDTO> create(@RequestBody SprintDTO dto) {
-        SprintDTO created = sprintService.createSprint(dto);
-        return ResponseEntity.status(201).body(created);
+        return ResponseEntity.status(201).body(sprintService.createSprint(dto));
     }
 
-    // GET ALL
     @GetMapping
     public ResponseEntity<List<SprintDTO>> getAll() {
         return ResponseEntity.ok(sprintService.getAllSprints());
     }
 
-    // GET BY ID
     @GetMapping("/{id}")
     public ResponseEntity<SprintDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(sprintService.getSprint(id));
     }
 
-    // UPDATE
     @PutMapping("/{id}")
     public ResponseEntity<SprintDTO> update(@PathVariable Long id, @RequestBody SprintDTO dto) {
         return ResponseEntity.ok(sprintService.updateSprint(id, dto));
     }
 
-    // DELETE
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         sprintService.deleteSprint(id);
         return ResponseEntity.noContent().build();
     }
 
-    // -------------------------
-    // Sprint Backlog Endpoints
-    // -------------------------
-
-    // GET Sprint Backlog (UserStories)
-    @GetMapping("/{sprintId}/backlog")
-    public ResponseEntity<List<UserStoryDto>> backlog(@PathVariable Long sprintId) {
-        return ResponseEntity.ok(sprintService.getSprintBacklog(sprintId));
+    // Get sprints by project
+    @GetMapping("/project/{projectId}")
+    public ResponseEntity<List<SprintDTO>> getByProject(@PathVariable Long projectId) {
+        return ResponseEntity.ok(sprintService.getSprintsByProject(projectId));
     }
 
-    // ADD UserStory to Sprint
+    // Assign userStory to sprint
     @PostMapping("/{sprintId}/userStories/{userStoryId}")
-    public ResponseEntity<UserStoryDto> addUserStory(@PathVariable Long sprintId,
-                                                     @PathVariable Long userStoryId) {
-        return ResponseEntity.ok(sprintService.addUserStoryToSprint(sprintId, userStoryId));
+    public ResponseEntity<Void> assignUserStory(
+            @PathVariable Long sprintId,
+            @PathVariable Long userStoryId
+    ) {
+        sprintService.assignUserStoryToSprint(sprintId, userStoryId);
+        return ResponseEntity.ok().build();
     }
 
-    // REMOVE UserStory from Sprint
-    @DeleteMapping("/{sprintId}/userStories/{userStoryId}")
-    public ResponseEntity<UserStoryDto> removeUserStory(@PathVariable Long sprintId,
-                                                        @PathVariable Long userStoryId) {
-        return ResponseEntity.ok(sprintService.removeUserStoryFromSprint(sprintId, userStoryId));
+    // Get userStories of a sprint
+    @GetMapping("/{sprintId}/userStories")
+    public ResponseEntity<List<UserStoryDto>> getUserStories(@PathVariable Long sprintId) {
+        return ResponseEntity.ok(sprintService.getUserStoriesBySprint(sprintId));
     }
 }

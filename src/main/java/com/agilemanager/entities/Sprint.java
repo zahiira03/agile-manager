@@ -35,7 +35,20 @@ public class Sprint {
 
 
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
+
+    // Helpers
+    public void addUserStory(UserStory us) {
+        userStories.add(us);
+        us.setSprint(this);
+    }
+
+    public void removeUserStory(UserStory us) {
+        userStories.remove(us);
+        us.setSprint(null);
+    }
+
+
 }

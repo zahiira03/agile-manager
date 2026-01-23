@@ -11,14 +11,15 @@ import com.agilemanager.repository.ProjectRepository;
 import com.agilemanager.repository.SprintRepository;
 import com.agilemanager.repository.UserStoryRepository;
 import com.agilemanager.services.interfaces.SprintService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class SprintServiceImpl implements SprintService {
 
     private final SprintRepository sprintRepository;
@@ -26,7 +27,9 @@ public class SprintServiceImpl implements SprintService {
     private final UserStoryRepository userStoryRepository;
 
     private final SprintMapper sprintMapper;
-    private final UserStoryMapper userStoryMapper; // عندك mapper ديال UserStory
+
+    //  UserStoryMapper
+    private final UserStoryMapper userStoryMapper;
 
     private Sprint getSprintEntity(Long id) {
         return sprintRepository.findById(id)
@@ -38,33 +41,34 @@ public class SprintServiceImpl implements SprintService {
                 .orElseThrow(() -> new RuntimeException("Project not found with id: " + id));
     }
 
+    private UserStory getUserStoryEntity(Long id) {
+        return userStoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("UserStory not found with id: " + id));
+    }
+
     @Override
     public SprintDTO createSprint(SprintDTO dto) {
-        // 1) نجيبو Project (Mandatory)
         if (dto.getProjectId() == null) {
             throw new RuntimeException("projectId is required to create a sprint");
         }
+
         Project project = getProjectEntity(dto.getProjectId());
 
-        // 2) DTO -> Entity
-        Sprint sprint = sprintMapper.toEntity(dto, project);
+        Sprint sprint = sprintMapper.toEntity(dto);
+        sprint.setProject(project);
 
-        // 3) Save
         Sprint saved = sprintRepository.save(sprint);
-
-        // 4) Entity -> DTO
         return sprintMapper.toDto(saved);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<SprintDTO> getAllSprints() {
-        return sprintRepository.findAll()
-                .stream()
-                .map(sprintMapper::toDto)
-                .toList();
+        return sprintMapper.toDtoList(sprintRepository.findAll());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public SprintDTO getSprint(Long id) {
         return sprintMapper.toDto(getSprintEntity(id));
     }
@@ -78,15 +82,17 @@ public class SprintServiceImpl implements SprintService {
     public SprintDTO updateSprint(Long id, SprintDTO dto) {
         Sprint sprint = getSprintEntity(id);
 
-        if (dto.getProjectId() == null) {
-            throw new RuntimeException("projectId is required to update a sprint");
+
+        sprintMapper.updateEntityFromDto(dto, sprint);
+
+
+        if (dto.getProjectId() != null) {
+            Project project = getProjectEntity(dto.getProjectId());
+            sprint.setProject(project);
         }
-        Project project = getProjectEntity(dto.getProjectId());
 
-        sprintMapper.updateEntity(sprint, dto, project);
-
-        Sprint updated = sprintRepository.save(sprint);
-        return sprintMapper.toDto(updated);
+        Sprint saved = sprintRepository.save(sprint);
+        return sprintMapper.toDto(saved);
     }
 
     @Override
@@ -95,43 +101,30 @@ public class SprintServiceImpl implements SprintService {
         sprintRepository.delete(sprint);
     }
 
-    // -------------------------
-    // Sprint Backlog (UserStory)
-    // -------------------------
-
     @Override
-    public List<UserStoryDto> getSprintBacklog(Long sprintId) {
-
-        return userStoryRepository.findBySprintId(sprintId)
-                .stream()
-                .map(userStoryMapper::toDto)
-                .toList();
+    @Transactional(readOnly = true)
+    public List<SprintDTO> getSprintsByProject(Long projectId) {
+        return sprintMapper.toDtoList(sprintRepository.findByProjectId(projectId));
     }
 
     @Override
-    @Transactional
-    public UserStoryDto addUserStoryToSprint(Long sprintId, Long userStoryId) {
+    public void assignUserStoryToSprint(Long sprintId, Long userStoryId) {
         Sprint sprint = getSprintEntity(sprintId);
+        UserStory userStory = getUserStoryEntity(userStoryId);
 
-        UserStory userStory = userStoryRepository.findById(userStoryId)
-                .orElseThrow(() -> new RuntimeException("UserStory not found with id: " + userStoryId));
 
         userStory.setSprint(sprint);
-        UserStory saved = userStoryRepository.save(userStory);
-
-        return userStoryMapper.toDto(saved);
+        userStoryRepository.save(userStory);
     }
 
     @Override
-    @Transactional
-    public UserStoryDto removeUserStoryFromSprint(Long sprintId, Long userStoryId) {
-        // كنحيّدو sprint من user story
-        UserStory userStory = userStoryRepository.findById(userStoryId)
-                .orElseThrow(() -> new RuntimeException("UserStory not found with id: " + userStoryId));
+    @Transactional(readOnly = true)
+    public List<UserStoryDto> getUserStoriesBySprint(Long sprintId) {
+        List<UserStory> list = userStoryRepository.findBySprintId(sprintId);
 
-        userStory.setSprint(null);
-        UserStory saved = userStoryRepository.save(userStory);
-
-        return userStoryMapper.toDto(saved);
+        return list.stream()
+                .map(userStoryMapper::toDto)
+                .toList(); // إذا Java 16+
     }
+
 }
