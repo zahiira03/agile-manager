@@ -19,4 +19,5 @@ public interface UserStoryService {
     UserStory update(Long id, UserStory userStory);
     void delete(Long id);
 
+    void assignToSprint(Long userStoryId, Long sprintId);
 }

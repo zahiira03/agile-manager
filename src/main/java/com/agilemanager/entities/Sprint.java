@@ -1,6 +1,5 @@
 package com.agilemanager.entities;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,7 +18,6 @@ public class Sprint {
 
     // Sprint Backlog = liste des user stories affectées à ce sprint
     @OneToMany(mappedBy = "sprint", cascade = CascadeType.ALL)
-    @JsonManagedReference
     private List<UserStory> userStories = new ArrayList<>();
 
     // ===== getters/setters =====

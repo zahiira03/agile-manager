@@ -83,9 +83,7 @@ public class UserStoryServiceImpl implements UserStoryService {
         Epic epic= epicService.findById(epicId);
         //hna ma3ytnach 3la attachepicprovidid
         // hit 3tana epic fin khassna ncree userstory
-        if (! Objects.equals(epicId,productBacklogId)){
-            throw new RuntimeException("Epic does not belong to the given ProductBacklog");
-        }
+
         // 4) valider champs obligatoires
         validateUserStory(userStory);
 
@@ -171,5 +169,19 @@ public class UserStoryServiceImpl implements UserStoryService {
         // 2) supprimer
         userStoryRepository.delete(existing);
     }
+
+
+    @Override
+    public void assignToSprint(Long userStoryId, Long sprintId) {
+        // Add the logic here to assign the user story to a sprint.
+        // This might involve database operations or business logic.
+        // Example:
+        // UserStory userStory = userStoryRepository.findById(userStoryId).orElseThrow(...);
+        // Sprint sprint = sprintRepository.findById(sprintId).orElseThrow(...);
+        // userStory.setSprint(sprint);
+        // userStoryRepository.save(userStory);
+    }
+
+
 
 }

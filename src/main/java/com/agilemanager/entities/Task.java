@@ -1,7 +1,7 @@
 package com.agilemanager.entities;
 
 import com.agilemanager.entities.enums.Status;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -19,7 +19,7 @@ public class Task {
 
     @ManyToOne
     @JoinColumn(name = "user_story_id")
-    @JsonBackReference
+    @JsonIgnore
     private UserStory userStory;
 
     // ===== getters/setters =====

@@ -37,7 +37,7 @@ public class SprintController {
         return sprintService.getSprintBacklog(id);
     }
 
-    @PostMapping("/{sprintId}/userstories/{userStoryId}")
+    @PostMapping("/{sprintId}/userStories/{userStoryId}")
     public UserStory addUserStory(@PathVariable Long sprintId, @PathVariable Long userStoryId) {
         return sprintService.addUserStoryToSprint(sprintId, userStoryId);
     }
