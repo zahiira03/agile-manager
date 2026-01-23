@@ -12,10 +12,8 @@ import com.agilemanager.repository.UserStoryRepository;
 import com.agilemanager.services.interfaces.UserStoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.agilemanager.exceptions.ResourceNotFoundException;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+
 
 
 @Service
@@ -49,21 +47,38 @@ public class UserStoryServiceImpl implements UserStoryService {
             return userStoryMapper.toDto(userStory);
         }
 
-        // hadi rat3tini ga3 les userstory f product backlog
-        @Override
-        public List<UserStoryDto> findAll() {
-            return userStoryRepository.findAll()
-                    .stream()
-                    .map(userStoryMapper::toDto)
-                    .toList();
+
+    @Override
+    public List<UserStoryDto> findByPriorityAndStatus(MoSCoW priority, Status status) {
+
+        List<UserStory> userStories;
+
+        if (priority != null && status != null) {
+            userStories = userStoryRepository.findByPriorityAndStatus(priority, status);
+        }
+        else if (priority != null) {
+            userStories = userStoryRepository.findByPriority(priority);
+        }
+        else if (status != null) {
+            userStories = userStoryRepository.findByStatus(status);
+        }
+        else {
+            userStories = userStoryRepository.findAll();
         }
 
-        // hadi rat3tini ri les userstory li kaynin fwahed epics
+        return userStories.stream()
+                .map(userStoryMapper::toDto)
+                .toList();
+    }
+
+
+    // hadi rat3tini ri les userstory li kaynin fwahed epics
+
         @Override
         public List<UserStoryDto> findByEpicId(Long epicId) {
-            if (!epicRepository.existsById(epicId)) {
-                throw new ResourceNotFoundException("Epic not found: " + epicId);
-            }
+            Epic epic = epicRepository.findById(epicId).orElseThrow(() -> new ResourceNotFoundException(
+                                               "Epic not found: " + epicId
+                    ));
 
             return userStoryRepository.findByEpicId(epicId)
                     .stream()
@@ -72,24 +87,9 @@ public class UserStoryServiceImpl implements UserStoryService {
         }
 
 
-        @Override
-        public List<UserStoryDto> findByPriority(MoSCoW priority) {
-            return userStoryRepository.findByPriority(priority)
-                    .stream()
-                    .map(userStoryMapper::toDto)
-                    .toList();
-        }
-
-        @Override
-        public List<UserStoryDto> findByStatus(Status status) {
-            return userStoryRepository.findByStatus(status)
-                    .stream()
-                    .map(userStoryMapper::toDto)
-                    .toList();
-        }
 
 
-        @Override
+    @Override
         public UserStoryDto updateUserStory(Long id, UserStoryDto userStoryDto) {
 
             UserStory existing = userStoryRepository.findById(id)

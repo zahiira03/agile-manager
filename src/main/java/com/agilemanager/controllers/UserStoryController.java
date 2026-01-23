@@ -53,28 +53,19 @@ public class UserStoryController {
     }
 
 
-//    // =========================================
-//    // GET all UserStories
-//    // GET /api/user-stories
-//    // + optional filters: ?priority=... &status=...
-//    // =========================================
-//    @GetMapping("/user-stories")
-//    public ResponseEntity<List<UserStoryDto>> getAll(
-//            @RequestParam(required = false) MoSCoW priority,
-//            @RequestParam(required = false) Status status
-//    ) {
-//
-//        // Si les deux filtres existent, on applique un choix simple :
-//        // priorité > status (ou tu peux créer une méthode repo combinée plus tard).
-//        if (priority != null) {
-//            return ResponseEntity.ok(userStoryService.findByPriority(priority));
-//        }
-//        if (status != null) {
-//            return ResponseEntity.ok(userStoryService.findByStatus(status));
-//        }
-//
-//        return ResponseEntity.ok(userStoryService.findAll());
-//    }
+
+    // + optional filters: ?priority=... &status=...
+
+    @GetMapping("/user-stories")
+    public ResponseEntity<List<UserStoryDto>> getAll(
+            @RequestParam(required = false) MoSCoW priority,
+            @RequestParam(required = false) Status status
+    ) {
+        return ResponseEntity.ok(
+                userStoryService.findByPriorityAndStatus(priority, status)
+        );
+    }
+
 
 
 
