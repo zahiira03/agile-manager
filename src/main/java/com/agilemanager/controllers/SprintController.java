@@ -1,49 +1,74 @@
 package com.agilemanager.controllers;
 
-import com.agilemanager.entities.Sprint;
-import com.agilemanager.entities.UserStory;
+import com.agilemanager.Dtos.SprintDTO;
+import com.agilemanager.Dtos.UserStoryDTO;
 import com.agilemanager.services.interfaces.SprintService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/sprints")
+@RequiredArgsConstructor
 public class SprintController {
 
     private final SprintService sprintService;
 
-    public SprintController(SprintService sprintService) {
-        this.sprintService = sprintService;
-    }
-
+    // CREATE Sprint
     @PostMapping
-    public Sprint create(@RequestBody Sprint sprint) {
-        return sprintService.createSprint(sprint);
+    public ResponseEntity<SprintDTO> create(@RequestBody SprintDTO dto) {
+        SprintDTO created = sprintService.createSprint(dto);
+        return ResponseEntity.status(201).body(created);
     }
 
+    // GET ALL
     @GetMapping
-    public List<Sprint> all() {
-        return sprintService.getAllSprints();
+    public ResponseEntity<List<SprintDTO>> getAll() {
+        return ResponseEntity.ok(sprintService.getAllSprints());
     }
 
+    // GET BY ID
     @GetMapping("/{id}")
-    public Sprint one(@PathVariable Long id) {
-        return sprintService.getSprint(id);
+    public ResponseEntity<SprintDTO> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(sprintService.getSprint(id));
     }
 
-    @GetMapping("/{id}/backlog")
-    public List<UserStory> sprintBacklog(@PathVariable Long id) {
-        return sprintService.getSprintBacklog(id);
+    // UPDATE
+    @PutMapping("/{id}")
+    public ResponseEntity<SprintDTO> update(@PathVariable Long id, @RequestBody SprintDTO dto) {
+        return ResponseEntity.ok(sprintService.updateSprint(id, dto));
     }
 
-    @PostMapping("/{sprintId}/userstories/{userStoryId}")
-    public UserStory addUserStory(@PathVariable Long sprintId, @PathVariable Long userStoryId) {
-        return sprintService.addUserStoryToSprint(sprintId, userStoryId);
+    // DELETE
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        sprintService.deleteSprint(id);
+        return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{sprintId}/userstories/{userStoryId}")
-    public UserStory removeUserStory(@PathVariable Long sprintId, @PathVariable Long userStoryId) {
-        return sprintService.removeUserStoryFromSprint(sprintId, userStoryId);
+    // -------------------------
+    // Sprint Backlog Endpoints
+    // -------------------------
+
+    // GET Sprint Backlog (UserStories)
+    @GetMapping("/{sprintId}/backlog")
+    public ResponseEntity<List<UserStoryDTO>> backlog(@PathVariable Long sprintId) {
+        return ResponseEntity.ok(sprintService.getSprintBacklog(sprintId));
+    }
+
+    // ADD UserStory to Sprint
+    @PostMapping("/{sprintId}/userStories/{userStoryId}")
+    public ResponseEntity<UserStoryDTO> addUserStory(@PathVariable Long sprintId,
+                                                     @PathVariable Long userStoryId) {
+        return ResponseEntity.ok(sprintService.addUserStoryToSprint(sprintId, userStoryId));
+    }
+
+    // REMOVE UserStory from Sprint
+    @DeleteMapping("/{sprintId}/userStories/{userStoryId}")
+    public ResponseEntity<UserStoryDTO> removeUserStory(@PathVariable Long sprintId,
+                                                        @PathVariable Long userStoryId) {
+        return ResponseEntity.ok(sprintService.removeUserStoryFromSprint(sprintId, userStoryId));
     }
 }

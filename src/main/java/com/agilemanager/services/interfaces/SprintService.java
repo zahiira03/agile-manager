@@ -1,21 +1,24 @@
 package com.agilemanager.services.interfaces;
 
-import com.agilemanager.entities.Sprint;
-import com.agilemanager.entities.UserStory;
+import com.agilemanager.Dtos.SprintDTO;
 
 import java.util.List;
 
 public interface SprintService {
 
-    Sprint createSprint(Sprint sprint);
+    // CRUD Sprint (DTO)
+    SprintDTO createSprint(SprintDTO dto);
+    List<SprintDTO> getAllSprints();
+    SprintDTO getSprint(Long id);
 
-    List<Sprint> getAllSprints();
+    SprintDTO getSprintById(Long id);
 
-    Sprint getSprint(Long id);
+    SprintDTO updateSprint(Long id, SprintDTO sprintDTO);
 
-    List<UserStory> getSprintBacklog(Long sprintId);
+    void deleteSprint(Long id);
 
-    UserStory addUserStoryToSprint(Long sprintId, Long userStoryId);
-
-    UserStory removeUserStoryFromSprint(Long sprintId, Long userStoryId);
+    // Sprint Backlog (UserStories)
+    List<UserStoryDTO> getSprintBacklog(Long sprintId);
+    UserStoryDTO addUserStoryToSprint(Long sprintId, Long userStoryId);
+    UserStoryDTO removeUserStoryFromSprint(Long sprintId, Long userStoryId);
 }
