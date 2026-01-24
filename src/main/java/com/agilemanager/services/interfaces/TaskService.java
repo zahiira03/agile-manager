@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface TaskService {
 
-    // CRUD Task (DTO)
+
     TaskDTO createTask(TaskDTO dto);
     List<TaskDTO> getAllTasks();
     TaskDTO getTask(Long id);

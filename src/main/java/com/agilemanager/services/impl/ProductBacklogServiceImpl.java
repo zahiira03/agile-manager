@@ -6,6 +6,7 @@ import com.agilemanager.entities.Project;
 import com.agilemanager.exceptions.ResourceNotFoundException;
 import com.agilemanager.mappers.ProductBacklogMapper;
 import com.agilemanager.repository.ProductBacklogRepository;
+import com.agilemanager.repository.ProjectRepository;
 import com.agilemanager.services.interfaces.ProductBacklogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class ProductBacklogServiceImpl implements ProductBacklogService {
 
     private final ProductBacklogRepository productBacklogRepository;
     private final ProductBacklogMapper productBacklogMapper;
+    private final ProjectRepository projectRepository;
 
     @Override
     public ProductBacklogDto findById(Long id) {
@@ -51,8 +53,16 @@ public class ProductBacklogServiceImpl implements ProductBacklogService {
 
     @Override
     public void deleteProductBacklog(Long id) {
-        ProductBacklog productBacklog = productBacklogRepository.findById(id)
+        ProductBacklog backlog = productBacklogRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ProductBacklog not found: " + id));
-        productBacklogRepository.delete(productBacklog);
+
+        Project project = backlog.getProject();
+        if (project != null) {
+            projectRepository.delete(project);
+        } else {
+
+            productBacklogRepository.delete(backlog);
+        }
     }
+
 }

@@ -18,7 +18,7 @@ import java.util.List;
 
 
 @Service
-@RequiredArgsConstructor //fait l`injection avec constructeur
+@RequiredArgsConstructor
 public class UserStoryServiceImpl implements UserStoryService {
 
         private final UserStoryRepository userStoryRepository;
@@ -83,7 +83,7 @@ public class UserStoryServiceImpl implements UserStoryService {
     }
 
 
-    // hadi rat3tini ri les userstory li kaynin fwahed epics
+
 
         @Override
         public List<UserStoryDto> findByEpicId(Long epicId) {
@@ -97,10 +97,10 @@ public class UserStoryServiceImpl implements UserStoryService {
                     .toList();
         }
 
-    // 2) Mettre à jour Sprint (relation)
+
     // - sprintId != null : affecter / déplacer dans ce sprint
     // - sprintId == null : retirer du sprint (si tu veux autoriser)
-    // 3) Mettre à jour Tasks (relation) uniquement si le client fournit tasksIds
+    // Mettre à jour Tasks (relation) uniquement si le client fournit tasksIds
     // - tasksIds == null : ne pas toucher aux tasks
     // - tasksIds == []   : vider la liste
     // - tasksIds == [..] : remplacer par cette liste exacte
@@ -111,31 +111,26 @@ public class UserStoryServiceImpl implements UserStoryService {
         UserStory existing = userStoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("UserStory not found: " + id));
 
-        // 1) champs simples (title, description, priority, status)
         userStoryMapper.updateEntityFromDto(dto, existing);
 
-        // 2) Sprint (relation)
         if (dto.getSprintId() != null) {
             Sprint sprint = sprintRepository.findById(dto.getSprintId())
                     .orElseThrow(() -> new ResourceNotFoundException("Sprint not found: " + dto.getSprintId()));
             existing.setSprint(sprint);
         } else {
-            // si tu autorises retirer du sprint :
+
             existing.setSprint(null);
         }
 
-        // 3) Tasks (relation) : IMPORTANT -> ne pas remplacer la collection !
         if (dto.getTasksIds() != null) {
 
-            // a) Détacher proprement les anciennes tasks (relation bidirectionnelle)
             for (Task t : existing.getTasks()) {
                 t.setUserStory(null);
             }
 
-            // b) vider la collection MANAGÉE par Hibernate
+
             existing.getTasks().clear();
 
-            // c) si liste non vide -> recharger et rattacher
             if (!dto.getTasksIds().isEmpty()) {
                 List<Task> tasks = taskRepository.findAllById(dto.getTasksIds());
 
@@ -143,12 +138,11 @@ public class UserStoryServiceImpl implements UserStoryService {
                     throw new ResourceNotFoundException("Certain tasksIds do not exist");
                 }
 
-                // rattacher côté owning side (Task.userStory)
+
                 for (Task t : tasks) {
                     t.setUserStory(existing);
                 }
 
-                // ajouter à la même collection
                 existing.getTasks().addAll(tasks);
             }
         }

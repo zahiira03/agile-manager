@@ -20,10 +20,8 @@ public class UserStoryDto {
     private MoSCoW priority;
     private Status status;
 
-    // Relations (uniquement les IDs)
     private Long epicId;
     private Long sprintId;
 
-    // Tasks associées
     private List<Long> tasksIds;
 }

@@ -28,7 +28,7 @@ public class SprintServiceImpl implements SprintService {
 
     private final SprintMapper sprintMapper;
 
-    //  UserStoryMapper
+
     private final UserStoryMapper userStoryMapper;
 
     private Sprint getSprintEntity(Long id) {
@@ -124,7 +124,7 @@ public class SprintServiceImpl implements SprintService {
 
         return list.stream()
                 .map(userStoryMapper::toDto)
-                .toList(); // إذا Java 16+
+                .toList();
     }
 
 }

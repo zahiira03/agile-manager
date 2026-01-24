@@ -16,29 +16,25 @@ public class ProjectController {
 
     private final ProjetService projetService;
 
-    // GET /api/projects/{id}
+
     @GetMapping("/{id}")
     public ResponseEntity<ProjectDto> getProject(@PathVariable Long id) {
         ProjectDto project = projetService.getProject(id);
         return ResponseEntity.ok(project);
     }
 
-    // GET /api/projects
     @GetMapping
     public ResponseEntity<List<ProjectDto>> getAllProjects() {
         List<ProjectDto> projects = projetService.getAllProjects();
         return ResponseEntity.ok(projects);
     }
 
-    // POST /api/projects
     @PostMapping
     public ResponseEntity<ProjectDto> createProject(@RequestBody ProjectDto projectDto) {
         ProjectDto created = projetService.createProject(projectDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-
-    // PUT /api/projects/{id}
     @PutMapping("/{id}")
     public ResponseEntity<ProjectDto> updateProject(
             @PathVariable Long id,
@@ -49,7 +45,6 @@ public class ProjectController {
     }
 
 
-    // DELETE /api/projects/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
         projetService.deleteProject(id);

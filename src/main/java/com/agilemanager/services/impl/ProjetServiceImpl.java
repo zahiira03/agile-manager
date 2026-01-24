@@ -41,23 +41,15 @@ public class ProjetServiceImpl implements ProjetService {
     @Override
     public ProjectDto createProject(ProjectDto projectdto) {
 
-        //Mapper DTO -> Entity (sans relations car ignore=true dans mapper)
-        Project project = projectMapper.toEntity(projectdto);
 
-        //Créer automatiquement un ProductBacklog
+        Project project = projectMapper.toEntity(projectdto);
         ProductBacklog backlog = new ProductBacklog();
         backlog.setName("Product Backlog - " + project.getName());
-
-        //Sauver le backlog pour obtenir son ID
         ProductBacklog savedBacklog = productBacklogRepository.save(backlog);
-
-        //Lier le backlog au projet
         project.setProductBacklog(savedBacklog);
 
-        //Sauver le projet
-        Project savedProject = projectRepository.save(project);
 
-        //Retourner DTO
+        Project savedProject = projectRepository.save(project);
         return projectMapper.toDto(savedProject);
     }
     @Override

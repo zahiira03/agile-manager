@@ -28,7 +28,7 @@ public class Sprint {
     @Enumerated(EnumType.STRING)
     private SprintStatus status;
     // Sprint Backlog = liste des user stories affectées à ce sprint
-    @OneToMany(mappedBy = "sprint", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "sprint")
     @JsonManagedReference
     @Builder.Default // pour éviter null avec @Builder
     private List<UserStory> userStories = new ArrayList<>();

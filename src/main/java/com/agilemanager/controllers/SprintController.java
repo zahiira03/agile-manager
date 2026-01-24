@@ -17,7 +17,7 @@ public class SprintController {
 
     private final SprintService sprintService;
 
-    // Create sprint (requires projectId)
+
     @PostMapping
     public ResponseEntity<SprintDTO> create(@RequestBody SprintDTO dto) {
         return ResponseEntity.status(201).body(sprintService.createSprint(dto));
@@ -44,13 +44,11 @@ public class SprintController {
         return ResponseEntity.noContent().build();
     }
 
-    // Get sprints by project
     @GetMapping("/project/{projectId}")
     public ResponseEntity<List<SprintDTO>> getByProject(@PathVariable Long projectId) {
         return ResponseEntity.ok(sprintService.getSprintsByProject(projectId));
     }
 
-    // Assign userStory to sprint
     @PostMapping("/{sprintId}/userStories/{userStoryId}")
     public ResponseEntity<Void> assignUserStory(
             @PathVariable Long sprintId,
@@ -60,7 +58,7 @@ public class SprintController {
         return ResponseEntity.ok().build();
     }
 
-    // Get userStories of a sprint
+
     @GetMapping("/{sprintId}/userStories")
     public ResponseEntity<List<UserStoryDto>> getUserStories(@PathVariable Long sprintId) {
         return ResponseEntity.ok(sprintService.getUserStoriesBySprint(sprintId));

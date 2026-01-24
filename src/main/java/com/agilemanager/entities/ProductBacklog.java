@@ -23,7 +23,7 @@ public class ProductBacklog {
     @OneToOne(mappedBy = "productBacklog")
     private Project project;
 
-    @OneToMany(mappedBy = "productBacklog", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "productBacklog", cascade = CascadeType.ALL ,orphanRemoval = true)
     private List<Epic> epics;
 
 

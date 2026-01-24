@@ -14,16 +14,14 @@ import java.util.List;
 @Getter
 
 public class SprintDTO {
-    private long id;
+    private Long id;
     private String name;
     private LocalDate startDate;
     private LocalDate endDate;
     private SprintStatus status;
 
-    // Sprint appartient à projet
-    private Long projectId;
 
-    // sprint contient les userstory
+    private Long projectId;
     private List<Long> userStoryIds;
 
 

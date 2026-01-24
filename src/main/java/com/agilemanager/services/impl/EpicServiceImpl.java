@@ -36,7 +36,6 @@ public class EpicServiceImpl implements EpicService {
             throw new RuntimeException("Epic must be linked to a ProductBacklog");
         }
 
-        // vérifie existence via le service (SRP + DIP)
         ProductBacklog productbacklog = productBacklogRepository.findById(productBacklogId).orElseThrow(() -> new ResourceNotFoundException(
                 "ProductBacklog not found: " + productBacklogId
         ));
@@ -47,16 +46,8 @@ public class EpicServiceImpl implements EpicService {
     }
     @Override
     public EpicDto updateEpic(Long id, EpicDto epicDto) {
-        //trouver epic a modifier
-        Epic existing = epicRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Epic not found: " + id));; // finfByid va genere exception si pas trouver
-//        if(epic.getTitle()==null  || epic.getTitle().trim().isEmpty())
-//        {
-//                throw new RuntimeException("Epic title cannot be null or empty");
-//        }//je dois aussi verifie si title n`est pas vide car il est nullable = false
 
-//      je fait les modification
-//      existing.setTitle(epicDto.getTitle());
-//      existing.setDescription(epicDto.getDescription());
+        Epic existing = epicRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Epic not found: " + id));; // finfByid va genere exception si pas trouver
         epicMapper.updateEntityFromDto(epicDto, existing);
         Epic savedEpic = epicRepository.save(existing);
         return epicMapper.toEpicDto(savedEpic);
@@ -89,12 +80,10 @@ public class EpicServiceImpl implements EpicService {
 
     @Override
     public List<EpicDto> findByProductBacklog(Long productBacklogId) {
-        // Optionnel : vérifier l'existence du backlog pour renvoyer 404 si inexistant
         if (!productBacklogRepository.existsById(productBacklogId)) {
             throw new ResourceNotFoundException("ProductBacklog not found: " + productBacklogId);
         }
 
-        // Nécessite une méthode repository : findByProductBacklogId(...)
         return epicRepository.findByProductBacklogId(productBacklogId)
                 .stream()
                 .map(epicMapper::toEpicDto)
