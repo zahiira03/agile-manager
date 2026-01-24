@@ -65,21 +65,12 @@ public class EpicServiceImpl implements EpicService {
     }
 
     @Override
-    @Transactional
     public void deleteEpic(Long id){
         Epic existing  = epicRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(
                 "epic not found: " + id
         ));
 
-        // 1️Détacher les UserStories
-//        if(existing.getUserStories()!= null){
-//            for(UserStory userStory : existing.getUserStories()){
-//                userStory.setEpic(null);
-//        }
-//        }
-
-        epicRepository.delete(existing);
-        //epicRepository.deleteById(id);
+        epicRepository.deleteById(id);
     }
 
     @Override

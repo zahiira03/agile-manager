@@ -24,7 +24,7 @@ public class Epic {
     @JoinColumn(name = "product_backlog_id")
     private ProductBacklog productBacklog;
 
-    @OneToMany(mappedBy = "epic",fetch =  FetchType.LAZY)
+    @OneToMany(mappedBy = "epic", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserStory> userStories;
 
 }
