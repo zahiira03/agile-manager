@@ -9,7 +9,6 @@ public interface ProductBacklogService {
 
     List< ProductBacklogDto> findAll();
     ProductBacklogDto findById(Long id);
-    ProductBacklogDto createProductBacklog(ProductBacklogDto  productBacklogDto);
     ProductBacklogDto updateProductBacklog(Long id,  ProductBacklogDto  productBacklogDto);
     void deleteProductBacklog(Long id);
 }

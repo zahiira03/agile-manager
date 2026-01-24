@@ -3,6 +3,7 @@ package com.agilemanager.services.impl;
 import com.agilemanager.Dtos.ProjectDto;
 import com.agilemanager.entities.ProductBacklog;
 import com.agilemanager.entities.Project;
+import com.agilemanager.exceptions.ResourceNotFoundException;
 import com.agilemanager.mappers.ProjectMapper;
 import com.agilemanager.repository.ProductBacklogRepository;
 import com.agilemanager.repository.ProjectRepository;
@@ -24,7 +25,7 @@ public class ProjetServiceImpl implements ProjetService {
     @Override
     public ProjectDto getProject(Long id) {
         Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Project not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found: " + id));
         //Project project=projectRepository.findById(id).get();
         return projectMapper.toDto(project);
     }
@@ -74,7 +75,7 @@ public class ProjetServiceImpl implements ProjetService {
     @Override
     public void deleteProject(Long id) {
         Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Project not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found: " + id));
         projectRepository.delete(project);
     }
 }

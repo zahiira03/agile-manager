@@ -31,7 +31,7 @@ public class Project {
 
 
 
-    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true ,optional = false)
     @JoinColumn(name = "product_backlog_id", nullable = false)
     private ProductBacklog productBacklog;
 

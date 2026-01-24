@@ -29,5 +29,10 @@ public interface UserStoryMapper {
         return task == null ? null : task.getId();
     }
 
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "epic", ignore = true)
+    @Mapping(target = "sprint", ignore = true)
+    @Mapping(target = "tasks", ignore = true)
     void updateEntityFromDto(UserStoryDto userStoryDto, @MappingTarget UserStory entity);
 }

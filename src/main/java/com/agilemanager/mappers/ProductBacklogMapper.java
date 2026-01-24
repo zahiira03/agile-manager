@@ -15,6 +15,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 //(ne pas écraser si null)
 public interface ProductBacklogMapper {
+    @Mapping(source = "project.id", target = "projectId")
     @Mapping(source = "epics", target = "epicIds")
     ProductBacklogDto toDto(ProductBacklog productbacklog);
 

@@ -97,55 +97,66 @@ public class UserStoryServiceImpl implements UserStoryService {
                     .toList();
         }
 
-
-
+    // 2) Mettre à jour Sprint (relation)
+    // - sprintId != null : affecter / déplacer dans ce sprint
+    // - sprintId == null : retirer du sprint (si tu veux autoriser)
+    // 3) Mettre à jour Tasks (relation) uniquement si le client fournit tasksIds
+    // - tasksIds == null : ne pas toucher aux tasks
+    // - tasksIds == []   : vider la liste
+    // - tasksIds == [..] : remplacer par cette liste exacte
 
     @Override
-    public UserStoryDto updateUserStory(Long id, UserStoryDto userStoryDto) {
+    public UserStoryDto updateUserStory(Long id, UserStoryDto dto) {
 
         UserStory existing = userStoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "UserStory not found: " + id
-                ));
+                .orElseThrow(() -> new ResourceNotFoundException("UserStory not found: " + id));
 
-        // 1) Mettre à jour les champs simples
-        userStoryMapper.updateEntityFromDto(userStoryDto, existing);
+        // 1) champs simples (title, description, priority, status)
+        userStoryMapper.updateEntityFromDto(dto, existing);
 
-        // 2) Mettre à jour Sprint (relation)
-        // - sprintId != null : affecter / déplacer dans ce sprint
-        // - sprintId == null : retirer du sprint (si tu veux autoriser)
-        if (userStoryDto.getSprintId() != null) {
-            Sprint sprint = sprintRepository.findById(userStoryDto.getSprintId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Sprint not found: " + userStoryDto.getSprintId()
-                    ));
+        // 2) Sprint (relation)
+        if (dto.getSprintId() != null) {
+            Sprint sprint = sprintRepository.findById(dto.getSprintId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Sprint not found: " + dto.getSprintId()));
             existing.setSprint(sprint);
         } else {
+            // si tu autorises retirer du sprint :
             existing.setSprint(null);
         }
 
-        // 3) Mettre à jour Tasks (relation) uniquement si le client fournit tasksIds
-        // - tasksIds == null : ne pas toucher aux tasks
-        // - tasksIds == []   : vider la liste
-        // - tasksIds == [..] : remplacer par cette liste exacte
-        if (userStoryDto.getTasksIds() != null) {
-            if (userStoryDto.getTasksIds().isEmpty()) {
-                existing.setTasks(List.of());
-            } else {
-                List<Task> tasks = taskRepository.findAllById(userStoryDto.getTasksIds());
+        // 3) Tasks (relation) : IMPORTANT -> ne pas remplacer la collection !
+        if (dto.getTasksIds() != null) {
 
-                // Vérifier que tous les ids existent
-                if (tasks.size() != userStoryDto.getTasksIds().size()) {
+            // a) Détacher proprement les anciennes tasks (relation bidirectionnelle)
+            for (Task t : existing.getTasks()) {
+                t.setUserStory(null);
+            }
+
+            // b) vider la collection MANAGÉE par Hibernate
+            existing.getTasks().clear();
+
+            // c) si liste non vide -> recharger et rattacher
+            if (!dto.getTasksIds().isEmpty()) {
+                List<Task> tasks = taskRepository.findAllById(dto.getTasksIds());
+
+                if (tasks.size() != dto.getTasksIds().size()) {
                     throw new ResourceNotFoundException("Certain tasksIds do not exist");
                 }
 
-                existing.setTasks(tasks);
+                // rattacher côté owning side (Task.userStory)
+                for (Task t : tasks) {
+                    t.setUserStory(existing);
+                }
+
+                // ajouter à la même collection
+                existing.getTasks().addAll(tasks);
             }
         }
 
         UserStory saved = userStoryRepository.save(existing);
         return userStoryMapper.toDto(saved);
     }
+
 
 
     @Override

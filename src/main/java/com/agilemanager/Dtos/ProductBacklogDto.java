@@ -9,6 +9,9 @@ import java.util.List;
 public class ProductBacklogDto {
     private Long id;
     private String name;
-    private List<Long> epicIds;   // ou userStoryIds selon ton modèle
+    private String description;
+
+    private long projectId;
+    private List<Long> epicIds;
 }
 

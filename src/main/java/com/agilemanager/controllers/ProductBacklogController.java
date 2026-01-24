@@ -18,17 +18,6 @@ public class ProductBacklogController {
     private final ProductBacklogService productBacklogService;
 
 
-//    @PostMapping
-//    public ProductBacklogDto create(@RequestBody ProductBacklogDto productBacklogDto) {
-//        ProductBacklogDto created = productBacklogService.createProductBacklog(productBacklogDto);
-//        return created;
-//    }
-
-    @PostMapping
-    public ResponseEntity<ProductBacklogDto> create(@RequestBody ProductBacklogDto dto) {
-        ProductBacklogDto created = productBacklogService.createProductBacklog(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
-    }
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductBacklogDto> update(@PathVariable Long id,
@@ -55,3 +44,13 @@ public class ProductBacklogController {
         return ResponseEntity.noContent().build(); //pas compris
     }
 }
+
+
+
+
+
+//    @PostMapping
+//    public ProductBacklogDto create(@RequestBody ProductBacklogDto productBacklogDto) {
+//        ProductBacklogDto created = productBacklogService.createProductBacklog(productBacklogDto);
+//        return created;
+//    }
