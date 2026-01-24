@@ -22,11 +22,9 @@ public class Epic {
     // Relation avec ProductBacklog
     @ManyToOne
     @JoinColumn(name = "product_backlog_id")
-    @JsonBackReference
     private ProductBacklog productBacklog;
 
     @OneToMany(mappedBy = "epic",fetch =  FetchType.LAZY)
-    @JsonManagedReference
     private List<UserStory> userStories;
 
 }

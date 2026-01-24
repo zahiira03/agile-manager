@@ -13,25 +13,20 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface UserStoryMapper {
     @Mapping(source = "epic.id", target = "epicId")
-    @Mapping(source = "productBacklog.id", target = "productBacklogId")
     @Mapping(source = "sprint.id", target = "sprintId")
     @Mapping(source = "tasks", target = "tasksIds")
     UserStoryDto toDto(UserStory entity);
 
 
     @Mapping(target = "epic", ignore = true)
-    @Mapping(target = "productBacklog", ignore = true)
     @Mapping(target = "sprint", ignore = true)
     @Mapping(target = "tasks", ignore = true)
     UserStory toEntity(UserStoryDto dto);
 
 
     // Mapping personnalisé
-    default List<Long> map(List<Task> tasks) {
-        if (tasks == null) return List.of();
-        return tasks.stream()
-                .map(Task::getId)
-                .collect(Collectors.toList());
+    default Long map(Task task) {
+        return task == null ? null : task.getId();
     }
 
     void updateEntityFromDto(UserStoryDto userStoryDto, @MappingTarget UserStory entity);

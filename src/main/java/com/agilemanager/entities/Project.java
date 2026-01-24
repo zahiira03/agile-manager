@@ -22,21 +22,20 @@ public class Project {
     @Column(nullable = false, unique = true)
     private String name;
 
-    // clé courte du projet (ex: AGILE, SCRUM01…)
     @Column(name = "project_key", nullable = false, unique = true, length = 10)
     private String projectKey;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    // ===== Relations =====
 
-    // Project 1 ---- 1 ProductBacklog
+
+
     @OneToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "product_backlog_id", nullable = false)
     private ProductBacklog productBacklog;
 
-    // Project 1 ---- * Sprint
+
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sprint> sprints = new ArrayList<>();
 

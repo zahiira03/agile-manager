@@ -1,0 +1,11 @@
+[33m7fc96c1[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature-epic-us-crud-and-sprint-tasks[m[33m, [m[1;31morigin/feature-epic-us-crud-and-sprint-tasks-merged[m[33m, [m[1;31morigin/feature-epic-us-crud-and-sprint-tasks[m[33m, [m[1;32mfeature-epic-us-crud-and-sprint-tasks-merged[m[33m)[m corriger conflit
+[33macbb6f1[m Fusion des deux branches
+[33m35f2bc5[m modify userstoryserviceimpl
+[33m5fcfc87[m[33m ([m[1;31morigin/feature-epic-us-crud-and-sprint-tasks-2[m[33m)[m DTO de sprint et task
+[33m409c8fe[m modify productbacklog epic and userstory by adding dtos
+[33m395259f[m[33m ([m[1;31morigin/ma-branche[m[33m)[m add project controller
+[33ma13d9e5[m add dto service and controller  for entity project
+[33m0a20986[m change key in project fields
+[33m4bc62ab[m update my entities
+[33m400ad4c[m sprint+task
+[33m9805733[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/feature-epic-us-crud[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m, [m[1;32mfeature-epic-us-crud[m[33m)[m Implémenter les controllers Epic UserStory et productBacklog

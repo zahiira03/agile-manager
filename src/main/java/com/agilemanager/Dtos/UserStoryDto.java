@@ -22,7 +22,6 @@ public class UserStoryDto {
 
     // Relations (uniquement les IDs)
     private Long epicId;
-    private Long productBacklogId;
     private Long sprintId;
 
     // Tasks associées

@@ -23,32 +23,22 @@ public class UserStory {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private MoSCoW priority;   // MoSCoW
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Status status;
 
 
     @ManyToOne
     @JoinColumn(name="epic_id",nullable = true)
-    @JsonBackReference
     private Epic epic;
 
     @ManyToOne
-    @JoinColumn(name="productBacklog_id",nullable = false)
-    @JsonBackReference
-    private ProductBacklog productBacklog;
-
-    @ManyToOne
     @JoinColumn(name = "sprint_id")
-    @JsonBackReference
     private Sprint sprint;
 
 
     @OneToMany(mappedBy = "userStory", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
     private List<Task> tasks = new ArrayList<>();
 
 

@@ -24,7 +24,6 @@ public class ProductBacklog {
     private Project project;
 
     @OneToMany(mappedBy = "productBacklog", cascade = CascadeType.ALL)
-    @JsonManagedReference
     private List<Epic> epics;
 
 
